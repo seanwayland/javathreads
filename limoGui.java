@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
+import java.awt.Font;
 
 public class limoGui {
 
@@ -17,6 +18,10 @@ public class limoGui {
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
+	private JTextField textField_5;
+	private JTextField textField_6;
+	private JTextField textField_7;
+	private JTextField textField_8;
 
 	/**
 	 * Launch the application.
@@ -99,6 +104,7 @@ public class limoGui {
 		textField_3.setColumns(10);
 		
 		JTextArea txtrThreadTestApplication = new JTextArea();
+		txtrThreadTestApplication.setFont(new Font("Century Schoolbook L", Font.BOLD, 12));
 		txtrThreadTestApplication.setText("Thread Test Application ");
 		txtrThreadTestApplication.setBounds(166, 8, 147, 15);
 		frame.getContentPane().add(txtrThreadTestApplication);
@@ -109,7 +115,8 @@ public class limoGui {
 		frame.getContentPane().add(txtrGrandTotal);
 		
 		JTextArea txtrGrandTotal_1 = new JTextArea();
-		txtrGrandTotal_1.setText("Grand Total");
+		txtrGrandTotal_1.setFont(new Font("Dialog", Font.BOLD, 12));
+		txtrGrandTotal_1.setText("Grand Total :");
 		txtrGrandTotal_1.setBounds(234, 179, 96, 15);
 		frame.getContentPane().add(txtrGrandTotal_1);
 		
@@ -117,5 +124,29 @@ public class limoGui {
 		textField_4.setBounds(362, 177, 61, 19);
 		frame.getContentPane().add(textField_4);
 		textField_4.setColumns(10);
+		
+		textField_5 = new JTextField();
+		textField_5.setText("1:");
+		textField_5.setBounds(12, 30, 29, 19);
+		frame.getContentPane().add(textField_5);
+		textField_5.setColumns(10);
+		
+		textField_6 = new JTextField();
+		textField_6.setText("2:");
+		textField_6.setBounds(12, 61, 22, 19);
+		frame.getContentPane().add(textField_6);
+		textField_6.setColumns(10);
+		
+		textField_7 = new JTextField();
+		textField_7.setText("3:");
+		textField_7.setBounds(12, 101, 29, 19);
+		frame.getContentPane().add(textField_7);
+		textField_7.setColumns(10);
+		
+		textField_8 = new JTextField();
+		textField_8.setText("4:");
+		textField_8.setBounds(12, 138, 22, 19);
+		frame.getContentPane().add(textField_8);
+		textField_8.setColumns(10);
 	}
 }
