@@ -3,11 +3,18 @@ package limo3;
 
 import java.awt.EventQueue;
 
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
 import javax.swing.JTextArea;
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -17,11 +24,17 @@ import javax.swing.JLabel;
 public class limoGui {
 
 	private JFrame frame;
-	private JTextField threadOneProgess;
+	private JTextField threadOneProgress;
 	private JTextField threadTwoProgress;
 	private JTextField threadThreeProgress;
 	private JTextField threadFourProgress;
 	private JTextField GrandTotal;
+	private JProgressBar progressBar1;
+	private JProgressBar progressBar2;
+	private JProgressBar progressBar3;
+	private JProgressBar progressBar4;
+	
+	private Task task;
 
 	/**
 	 * Launch the application.
@@ -38,6 +51,27 @@ public class limoGui {
 			}
 		});
 	}
+	
+	   private class Task extends Thread {    
+		      public Task(){
+		      }
+		      public void run(){
+		         for(int i =0; i<= 100; i+=10){
+		            final int progress = i;
+		            
+		            SwingUtilities.invokeLater(new Runnable() {
+		               public void run() {
+		                  progressBar1.setValue(progress);
+		                  threadOneProgress.setText(threadOneProgress.getText() 
+		                     + String.format("Completed %d%% of task.\n", progress));
+		               }
+		            });
+		            try {
+		               Thread.sleep(100);
+		            } catch (InterruptedException e) {}
+		         }
+		      }
+		   }   
 
 	/**
 	 * Create the application.
@@ -45,6 +79,9 @@ public class limoGui {
 	public limoGui() {
 		initialize();
 	}
+	
+	
+	
 
 	/**
 	 * Initialize the contents of the frame.
@@ -59,6 +96,8 @@ public class limoGui {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane.showMessageDialog(null, "hi");
+				task = new Task();                
+	            task.start();
 			}
 		});
 		btnStart.setBounds(12, 217, 96, 25);
@@ -98,10 +137,10 @@ public class limoGui {
 		progressBar4.setBounds(46, 143, 284, 14);
 		frame.getContentPane().add(progressBar4);
 		
-		threadOneProgess = new JTextField();
-		threadOneProgess.setBounds(362, 35, 61, 19);
-		frame.getContentPane().add(threadOneProgess);
-		threadOneProgess.setColumns(10);
+		threadOneProgress = new JTextField();
+		threadOneProgress.setBounds(362, 35, 61, 19);
+		frame.getContentPane().add(threadOneProgress);
+		threadOneProgress.setColumns(10);
 		
 		threadTwoProgress = new JTextField();
 		threadTwoProgress.setBounds(362, 70, 61, 19);
@@ -152,4 +191,8 @@ public class limoGui {
 		lblThreadTestApplication.setBounds(99, 8, 166, 15);
 		frame.getContentPane().add(lblThreadTestApplication);
 	}
+	
+
 }
+
+   
