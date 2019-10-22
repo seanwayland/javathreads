@@ -21,88 +21,172 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 
+
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+ 
 public class limoGui {
+	
+	
+   private JFrame mainFrame;
+   private JLabel headerLabel;
+   private JLabel statusLabel;
+   private JPanel controlPanel;
+   
+   
 
-	private JFrame frame;
-	private JTextField threadOneProgress;
-	private JTextField threadTwoProgress;
-	private JTextField threadThreeProgress;
-	private JTextField threadFourProgress;
-	private JTextField GrandTotal;
-	private JProgressBar progressBar1;
-	private JProgressBar progressBar2;
-	private JProgressBar progressBar3;
-	private JProgressBar progressBar4;
-	
-	private Task task;
+   
+   public limoGui(){
+      prepareGUI();
+   }
+   public static void main(String[] args){
+      limoGui  swingControlDemo = new limoGui();      
+      swingControlDemo.showProgressBarDemo();
+   }
+   
+   
+   private void prepareGUI(){
+      mainFrame = new JFrame("Java Swing Examples");
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					limoGui window = new limoGui();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
-	   private class Task extends Thread {    
-		      public Task(){
-		      }
-		      public void run(){
-		         for(int i =0; i<= 100; i+=10){
-		            final int progress = i;
-		            
-		            SwingUtilities.invokeLater(new Runnable() {
-		               public void run() {
-		                  progressBar1.setValue(progress);
-		                  threadOneProgress.setText(threadOneProgress.getText() 
-		                     + String.format("Completed %d%% of task.\n", progress));
-		               }
-		            });
-		            try {
-		               Thread.sleep(100);
-		            } catch (InterruptedException e) {}
-		         }
-		      }
-		   }   
+      mainFrame.getContentPane().setLayout(null);
+		mainFrame.setBounds(100, 100, 450, 300);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-	/**
-	 * Create the application.
-	 */
-	public limoGui() {
-		initialize();
-	}
-	
-	
-	
+      
+      mainFrame.addWindowListener(new WindowAdapter() {
+         public void windowClosing(WindowEvent windowEvent){
+            System.exit(0);
+         }        
+      });    
+      headerLabel = new JLabel();        
+      statusLabel = new JLabel();    
+      statusLabel.setSize(350,100);
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+      controlPanel = new JPanel();
+
+
+      mainFrame.getContentPane().add(headerLabel);
+      mainFrame.getContentPane().add(controlPanel);
+      mainFrame.getContentPane().add(statusLabel);
+      mainFrame.setVisible(true);  
+      
+      
+		JLabel label = new JLabel("1:");
+		label.setBounds(12, 34, 66, 15);
+		mainFrame.getContentPane().add(label);
 		
-		JButton btnStart = new JButton("start");
-		btnStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null, "hi");
-				task = new Task();                
-	            task.start();
-			}
-		});
-		btnStart.setBounds(12, 217, 96, 25);
-		frame.getContentPane().add(btnStart);
+		JLabel label_1 = new JLabel("2:");
+		label_1.setBounds(12, 69, 66, 15);
+		mainFrame.getContentPane().add(label_1);
 		
+		JLabel label_2 = new JLabel("3:");
+		label_2.setBounds(12, 105, 66, 15);
+		mainFrame.getContentPane().add(label_2);
+		
+		JLabel label_3 = new JLabel("4:");
+		label_3.setBounds(12, 142, 66, 15);
+		mainFrame.getContentPane().add(label_3);
+      
+      
+      
+   }
+   private JProgressBar progressBar;
+   private JProgressBar progressBar2;
+   private JProgressBar progressBar3;
+   private JProgressBar progressBar4;
+   private Task task;
+   private Task task2;
+   private Task task3;
+   private Task task4;
+   private JButton startButton;
+   private JTextArea threadOneProgress;
+   private JTextArea threadOneProgress2;
+   private JTextArea threadOneProgress3;
+   private JTextArea threadOneProgress4;
+   
+
+   
+   private void showProgressBarDemo(){
+	   
+      headerLabel.setText("Thread Test Application "); 
+      headerLabel.setBounds(99, 8, 166, 15);
+      
+
+      
+      // create 4 progress bars and add to frame 
+      progressBar = new JProgressBar(0, 100);
+      progressBar.setValue(0);
+      progressBar.setStringPainted(true);
+      progressBar.setBounds(46, 35, 284, 14);
+	  mainFrame.getContentPane().add(progressBar);
+	  
+	  
+      progressBar2 = new JProgressBar(0, 100);
+      progressBar2.setValue(0);
+      progressBar2.setStringPainted(true);
+      progressBar2.setBounds(46, 70, 284, 14);
+	  mainFrame.getContentPane().add(progressBar2);
+	  
+      progressBar3 = new JProgressBar(0, 100);
+      progressBar3.setValue(0);
+      progressBar3.setStringPainted(true);
+      progressBar3.setBounds(46, 106, 284, 14);
+	  mainFrame.getContentPane().add(progressBar3);
+	  
+      progressBar4 = new JProgressBar(0, 100);
+      progressBar4.setValue(0);
+      progressBar4.setStringPainted(true);
+      progressBar4.setBounds(46, 143, 284, 14);
+	  mainFrame.getContentPane().add(progressBar4);
+	  
+	  // create a start button 
+	  
+      startButton = new JButton("Start");
+      startButton.setBounds(12, 217, 96, 25);
+      
+      // create output text panels 
+      threadOneProgress = new JTextArea();
+      threadOneProgress.setBounds(362, 35, 61, 19);
+      threadOneProgress2 = new JTextArea();
+      threadOneProgress2.setBounds(362, 70, 61, 19);
+      threadOneProgress3 = new JTextArea();
+      threadOneProgress3.setBounds(362, 101, 61, 19);
+      threadOneProgress4 = new JTextArea();
+      threadOneProgress4.setBounds(362, 138, 61, 19);
+      
+      // add output text panels to window 
+	  mainFrame.getContentPane().add(threadOneProgress);
+	  mainFrame.getContentPane().add(threadOneProgress2);
+	  mainFrame.getContentPane().add(threadOneProgress3);
+	  mainFrame.getContentPane().add(threadOneProgress4);
+	  threadOneProgress.setColumns(10);
+	  threadOneProgress2.setColumns(10);
+	  threadOneProgress3.setColumns(10);
+	  threadOneProgress4.setColumns(10);
+      //JScrollPane scrollPane = new JScrollPane(threadOneProgress);
+	  
+	  // When start button is clicked start 4 tasks
+      
+      startButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            task = new Task(progressBar, threadOneProgress, 50);                
+            task.start();
+            task2 = new Task(progressBar2, threadOneProgress2, 60);                
+            task2.start();
+            task3 = new Task(progressBar3, threadOneProgress3, 70);                
+            task3.start();
+            task4 = new Task(progressBar4, threadOneProgress4, 80);                
+            task4.start();
+         }
+      });
+      mainFrame.add(startButton);
+      mainFrame.add(progressBar);
+
+      
+         // create a pause button 
 		JButton btnPause = new JButton("pause");
 		btnPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -110,8 +194,9 @@ public class limoGui {
 			}
 		});
 		btnPause.setBounds(120, 217, 96, 25);
-		frame.getContentPane().add(btnPause);
+		mainFrame.getContentPane().add(btnPause);
 		
+		// create a resume button 
 		JButton btnResume = new JButton("resume");
 		btnResume.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -119,80 +204,40 @@ public class limoGui {
 			}
 		});
 		btnResume.setBounds(228, 217, 85, 25);
-		frame.getContentPane().add(btnResume);
-		
-		JProgressBar progressBar1 = new JProgressBar();
-		progressBar1.setBounds(46, 35, 284, 14);
-		frame.getContentPane().add(progressBar1);
-		
-		JProgressBar progressBar2 = new JProgressBar();
-		progressBar2.setBounds(46, 70, 284, 14);
-		frame.getContentPane().add(progressBar2);
-		
-		JProgressBar progressBar3 = new JProgressBar();
-		progressBar3.setBounds(46, 106, 284, 14);
-		frame.getContentPane().add(progressBar3);
-		
-		JProgressBar progressBar4 = new JProgressBar();
-		progressBar4.setBounds(46, 143, 284, 14);
-		frame.getContentPane().add(progressBar4);
-		
-		threadOneProgress = new JTextField();
-		threadOneProgress.setBounds(362, 35, 61, 19);
-		frame.getContentPane().add(threadOneProgress);
-		threadOneProgress.setColumns(10);
-		
-		threadTwoProgress = new JTextField();
-		threadTwoProgress.setBounds(362, 70, 61, 19);
-		frame.getContentPane().add(threadTwoProgress);
-		threadTwoProgress.setColumns(10);
-		
-		threadThreeProgress = new JTextField();
-		threadThreeProgress.setBounds(362, 101, 61, 19);
-		frame.getContentPane().add(threadThreeProgress);
-		threadThreeProgress.setColumns(10);
-		
-		threadFourProgress = new JTextField();
-		threadFourProgress.setBounds(362, 138, 61, 19);
-		frame.getContentPane().add(threadFourProgress);
-		threadFourProgress.setColumns(10);
-		
-		JTextArea txtrGrandTotal = new JTextArea();
-		txtrGrandTotal.setText("Grand Total");
-		txtrGrandTotal.setBounds(239, 169, 1, 15);
-		frame.getContentPane().add(txtrGrandTotal);
-		
-		GrandTotal = new JTextField();
-		GrandTotal.setBounds(362, 177, 61, 19);
-		frame.getContentPane().add(GrandTotal);
-		GrandTotal.setColumns(10);
-		
-		JLabel label = new JLabel("1:");
-		label.setBounds(12, 34, 66, 15);
-		frame.getContentPane().add(label);
-		
-		JLabel label_1 = new JLabel("2:");
-		label_1.setBounds(12, 69, 66, 15);
-		frame.getContentPane().add(label_1);
-		
-		JLabel label_2 = new JLabel("3:");
-		label_2.setBounds(12, 105, 66, 15);
-		frame.getContentPane().add(label_2);
-		
-		JLabel label_3 = new JLabel("4:");
-		label_3.setBounds(12, 142, 66, 15);
-		frame.getContentPane().add(label_3);
-		
-		JLabel lblGrandTotal = new JLabel("Grand Total:");
-		lblGrandTotal.setBounds(259, 179, 85, 15);
-		frame.getContentPane().add(lblGrandTotal);
-		
-		JLabel lblThreadTestApplication = new JLabel("Thread Test Application ");
-		lblThreadTestApplication.setBounds(99, 8, 166, 15);
-		frame.getContentPane().add(lblThreadTestApplication);
-	}
-	
-
+		mainFrame.getContentPane().add(btnResume);
+   }
+   
+   // create a thread with parameters progress bar 
+   // thread total label 
+   // grand total label 
+   // interval in milliseconds for sleep step in each thread 
+   private class Task extends Thread { 
+	   private final JProgressBar ThreadProgressBar;
+	   private final JTextArea ThreadTextArea;
+	   private final int SleepTime; 
+      public Task(final JProgressBar JP, JTextArea JT, int ST ){
+    	 ThreadProgressBar = JP;
+    	 ThreadTextArea = JT;
+    	 SleepTime = ST; 
+    	 
+      }
+      public void run(){
+         for(int i =0; i<= 100; i+=1){
+            final int progress = i;
+            
+            SwingUtilities.invokeLater(new Runnable() {
+               public void run() {
+                  // update the gui for this thread 
+				ThreadProgressBar.setValue(progress);
+                  ThreadTextArea.setText( 
+                      String.format("%d", progress));
+               }
+            });
+            try {
+               Thread.sleep(SleepTime);
+            } catch (InterruptedException e) {}
+         }
+      }
+   }   
 }
-
    
