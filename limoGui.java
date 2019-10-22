@@ -1,5 +1,9 @@
 package limo3;
 
+/***
+ * multithreaded GUI application 
+ * create a swing form in eclipse and run simultaneous threads in a non blocking way
+ */
 
 import java.awt.EventQueue;
 
