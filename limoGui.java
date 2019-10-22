@@ -98,7 +98,7 @@ public class limoGui {
 	private JTextArea threadOneProgress2;
 	private JTextArea threadOneProgress3;
 	private JTextArea threadOneProgress4;
-	private JTextField GrandTotal;
+	private JTextArea GrandTotal;
 
 	private void showProgressBarDemo() {
 
@@ -155,16 +155,18 @@ public class limoGui {
 		threadOneProgress3.setColumns(10);
 		threadOneProgress4.setColumns(10);
 
-		JTextArea txtrGrandTotal_1 = new JTextArea();
+		JTextField txtrGrandTotal_1 = new JTextField();
 		txtrGrandTotal_1.setFont(new Font("Dialog", Font.BOLD, 12));
 		txtrGrandTotal_1.setText("Grand Total :");
 		txtrGrandTotal_1.setBounds(234, 179, 96, 15);
+		
 		mainFrame.getContentPane().add(txtrGrandTotal_1);
 
-		GrandTotal = new JTextField();
+		GrandTotal = new JTextArea();
 		GrandTotal.setBounds(362, 177, 61, 19);
 		mainFrame.getContentPane().add(GrandTotal);
 		GrandTotal.setColumns(10);
+		GrandTotal.setText("0");
 
 		// JScrollPane scrollPane = new JScrollPane(threadOneProgress);
 
@@ -173,13 +175,13 @@ public class limoGui {
 		startButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				task = new Task(progressBar, threadOneProgress, 50);
+				task = new Task(progressBar, threadOneProgress, GrandTotal, 50);
 				task.start();
-				task2 = new Task(progressBar2, threadOneProgress2, 60);
+				task2 = new Task(progressBar2, threadOneProgress2, GrandTotal, 70);
 				task2.start();
-				task3 = new Task(progressBar3, threadOneProgress3, 70);
+				task3 = new Task(progressBar3, threadOneProgress3, GrandTotal, 90);
 				task3.start();
-				task4 = new Task(progressBar4, threadOneProgress4, 80);
+				task4 = new Task(progressBar4, threadOneProgress4, GrandTotal , 110);
 				task4.start();
 			}
 		});
@@ -214,24 +216,45 @@ public class limoGui {
 	private class Task extends Thread {
 		private final JProgressBar ThreadProgressBar;
 		private final JTextArea ThreadTextArea;
+		private final JTextArea GrandTotalArea;
 		private final int SleepTime;
 
-		public Task(final JProgressBar JP, JTextArea JT, int ST) {
+		public Task(final JProgressBar JP, JTextArea JT, JTextArea GT, int ST) {
 			ThreadProgressBar = JP;
 			ThreadTextArea = JT;
 			SleepTime = ST;
+			GrandTotalArea = GT; 
 
 		}
 
 		public void run() {
-			for (int i = 0; i <= 100; i += 1) {
+			for ( int i = 0; i <= 100; i += 1) {
 				final int progress = i;
+				int j = i; 
 
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						// update the gui for this thread
 						ThreadProgressBar.setValue(progress);
 						ThreadTextArea.setText(String.format("%d", progress));
+						// this wont work !! 
+						
+				        synchronized(GrandTotalArea) 
+				        { 
+				            // synchronizing the update of GrandTotalObject 
+						if (j<100) {GrandTotalArea.setText(String.format("%d", (1 + Integer.parseInt(GrandTotalArea.getText()))));
+					   
+						try {
+							sleep(50);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace(System.out);
+							
+						}}
+						
+				        }
+				
+						
 					}
 				});
 				try {
