@@ -36,15 +36,36 @@ public class limoGui {
 	private JPanel controlPanel;
 
 	public limoGui() {
-		prepareGUI();
-	}
+		
+
+				prepareGUI();
+			}
+				
+		
+	
+		
+	
 
 	public static void main(String[] args) {
-		limoGui swingControlDemo = new limoGui();
-		swingControlDemo.showProgressBarDemo();
+		
+		///call the GUI constructor on the Event Dispatch Thread
+		
+		
+        SwingUtilities.invokeLater(new Runnable() {  //Note 1
+            public void run() {
+        		limoGui swingControlDemo = new limoGui();
+        		swingControlDemo.showProgressBarDemo();
+
+            }
+        });
+		
+		
+
 	}
 
+	 
 	private void prepareGUI() {
+		
 		mainFrame = new JFrame("Java Swing Examples");
 
 		mainFrame.getContentPane().setLayout(null);
@@ -55,6 +76,8 @@ public class limoGui {
 			public void windowClosing(WindowEvent windowEvent) {
 				System.exit(0);
 			}
+
+
 		});
 		headerLabel = new JLabel();
 		statusLabel = new JLabel();
@@ -84,6 +107,7 @@ public class limoGui {
 		mainFrame.getContentPane().add(label_3);
 
 	}
+	
 
 	private JProgressBar progressBar;
 	private JProgressBar progressBar2;
@@ -242,10 +266,13 @@ public class limoGui {
 				        synchronized(GrandTotalArea) 
 				        { 
 				            // synchronizing the update of GrandTotalObject 
-						if (j<100) {GrandTotalArea.setText(String.format("%d", (1 + Integer.parseInt(GrandTotalArea.getText()))));
+						if (j<100) 
+						
+						{
 					   
 						try {
 							sleep(50);
+							GrandTotalArea.setText(String.format("%d", (1 + Integer.parseInt(GrandTotalArea.getText()))));
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace(System.out);
