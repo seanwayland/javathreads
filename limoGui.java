@@ -103,10 +103,7 @@ public class limoGui {
 	private JProgressBar progressBar2;
 	private JProgressBar progressBar3;
 	private JProgressBar progressBar4;
-	private Task task;
-	private Task task2;
-	private Task task3;
-	private Task task4;
+
 	private Worker worker;
 	private Worker worker2;
 	private Worker worker3;
@@ -196,23 +193,17 @@ public class limoGui {
 
 				/**
 				 * start a version using SwingWorker
-				 */
-				worker = new Worker(progressBar, threadOneProgress, GrandTotal, 60);
-				worker.execute();
-				worker2 = new Worker(progressBar2, threadOneProgress2, GrandTotal, 60);
-				worker2.execute();
-				worker3 = new Worker(progressBar3, threadOneProgress3, GrandTotal, 60);
-				worker3.execute();
-				worker4 = new Worker(progressBar4, threadOneProgress4, GrandTotal, 60);
-				worker4.execute();
-				/***
-				 * task = new Task(progressBar, threadOneProgress, GrandTotal, 60);
-				 * task.start(); task2 = new Task(progressBar2, threadOneProgress2, GrandTotal,
-				 * 60); task2.start(); task3 = new Task(progressBar3, threadOneProgress3,
-				 * GrandTotal, 60); task3.start(); task4 = new Task(progressBar4,
-				 * threadOneProgress4, GrandTotal , 60); task4.start();
 				 * 
-				 ***/
+				 */
+				worker = new Worker(progressBar, threadOneProgress, GrandTotal, 50);
+				worker.execute();
+				worker2 = new Worker(progressBar2, threadOneProgress2, GrandTotal, 50);
+				worker2.execute();
+				worker3 = new Worker(progressBar3, threadOneProgress3, GrandTotal, 50);
+				worker3.execute();
+				worker4 = new Worker(progressBar4, threadOneProgress4, GrandTotal, 50);
+				worker4.execute();
+
 			}
 		});
 		mainFrame.add(startButton);
@@ -222,7 +213,12 @@ public class limoGui {
 		JButton btnPause = new JButton("pause");
 		btnPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null, "hi");
+				// JOptionPane.showMessageDialog(null, "hi");
+				/** pause the running threads */
+				worker.pause();
+				worker2.pause();
+				worker3.pause();
+				worker4.pause();
 			}
 		});
 		btnPause.setBounds(120, 217, 96, 25);
@@ -232,7 +228,13 @@ public class limoGui {
 		JButton btnResume = new JButton("resume");
 		btnResume.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null, "hi");
+				// JOptionPane.showMessageDialog(null, "hi");
+				/** resume the running threads */
+				//
+				worker.resume();
+				worker2.resume();
+				worker3.resume();
+				worker4.resume();
 			}
 		});
 		btnResume.setBounds(228, 217, 85, 25);
@@ -243,10 +245,25 @@ public class limoGui {
 
 	class Worker extends SwingWorker<Boolean, Integer> {
 
+		// local copy of gui elements
+
 		private final JProgressBar WorkerThreadProgressBar;
 		private final JTextArea WorkerThreadTextArea;
 		private final JTextArea WorkerGrandTotalArea;
 		private final int WorkerSleepTime;
+		int x = 0;
+
+		private boolean paused = false; // check if thread is paused
+
+		public synchronized void pause() {
+			paused = true;
+			notify();
+		} // pause function
+
+		public synchronized void resume() {
+			paused = false;
+			notify();
+		} // resume function
 
 		Worker(JProgressBar WTPB, JTextArea WTTA, JTextArea WGTA, int WST) {
 			WorkerThreadProgressBar = WTPB;
@@ -259,17 +276,53 @@ public class limoGui {
 		protected Boolean doInBackground() throws Exception {
 			// To identify whether the background job is running out of EDT
 			System.out.println("doSomething() running in EDT?" + SwingUtilities.isEventDispatchThread());
+			try {
+				Thread.sleep(WorkerSleepTime);
+			} catch (InterruptedException e) {
+				e.printStackTrace(System.out);
+			}
+
+			///
 
 			for (int i = 0; i <= 100; i += 1) {
+
+				// check if thread has been paused
+				synchronized (this) {
+					while (paused) {
+						wait(); // The current thread will block until some else calls notify()
+								// Then if _suspended is false, it keeps looping the for
+					}
+				}
+
 				final int progress = i;
 				int j = i;
+				// WorkerThreadTextArea.setText(i);
 
-				try {
-					Thread.sleep(WorkerSleepTime);
-				} catch (InterruptedException e) {
-					e.printStackTrace(System.out);
+				synchronized (WorkerGrandTotalArea) {
+					// synchronizing the update of GrandTotalObject
+
+					{
+
+						try {
+
+							Thread.sleep(50);
+							if (x < 100) {
+								WorkerGrandTotalArea.setText(
+										String.format("%d", (1 + Integer.parseInt(WorkerGrandTotalArea.getText()))));
+								x++;
+							}
+
+							// System.out.println("doSomething() running in EDT?" +
+							// SwingUtilities.isEventDispatchThread());
+
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace(System.out);
+						}
+					}
 				}
 				publish(i);
+
 			}
 
 			return true;
@@ -278,7 +331,7 @@ public class limoGui {
 		@Override
 		protected void done() {
 			try {
-				/// label.setText(String.format("%d", get()));
+
 			} catch (Exception ignore) {
 			}
 		}
@@ -286,92 +339,12 @@ public class limoGui {
 		@Override
 		protected void process(List<Integer> chunks) {
 			for (int num : chunks) {
-				WorkerThreadTextArea.setText(String.format("%d", num));
+
 				WorkerThreadProgressBar.setValue(num);
+				WorkerThreadTextArea.setText(String.format("%d", num));
 
-				synchronized (WorkerGrandTotalArea) {
-					// synchronizing the update of GrandTotalObject
-					if (num < 100)
-
-					{
-
-						try {
-							Thread.sleep(50);
-							WorkerGrandTotalArea.setText(
-									String.format("%d", (1 + Integer.parseInt(WorkerGrandTotalArea.getText()))));
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace(System.out);
-
-						}
-					}
-
-				}
 			}
 
 		}
 	}
-
-	// create a thread with parameters progress bar
-	// thread total label
-	// grand total label
-	// interval in milliseconds for sleep step in each thread
-	// this is unused
-	private class Task extends Thread {
-		private final JProgressBar ThreadProgressBar;
-		private final JTextArea ThreadTextArea;
-		private final JTextArea GrandTotalArea;
-		private final int SleepTime;
-
-		public Task(final JProgressBar JP, JTextArea JT, JTextArea GT, int ST) {
-			ThreadProgressBar = JP;
-			ThreadTextArea = JT;
-			SleepTime = ST;
-			GrandTotalArea = GT;
-
-		}
-
-		public void run() {
-			for (int i = 0; i <= 100; i += 1) {
-				final int progress = i;
-				int j = i;
-
-				// asyncExec(new Runnable() {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// update the gui for this thread
-						ThreadProgressBar.setValue(progress);
-						ThreadTextArea.setText(String.format("%d", progress));
-						// this wont work !!
-
-						synchronized (GrandTotalArea) {
-							// synchronizing the update of GrandTotalObject
-							if (j < 100)
-
-							{
-
-								try {
-									sleep(50);
-									GrandTotalArea.setText(
-											String.format("%d", (1 + Integer.parseInt(GrandTotalArea.getText()))));
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace(System.out);
-
-								}
-							}
-
-						}
-
-					}
-				});
-				try {
-					Thread.sleep(SleepTime);
-				} catch (InterruptedException e) {
-					e.printStackTrace(System.out);
-				}
-			}
-		}
-	}
-
 }
