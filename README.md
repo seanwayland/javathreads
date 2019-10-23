@@ -6,11 +6,8 @@ Thread class which accepts the GUI elements as data members.
 
 4 threads created to update GUI display.
 
-Swingworker class is implemented. Also regular javascript thread class included but not used. 
-
-TODO :
+grand total of threads is in critical section 
 
 
-implement Pause and Resume 
 
 
