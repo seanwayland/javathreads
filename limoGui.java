@@ -21,12 +21,14 @@ import javax.swing.*;
 import javax.swing.JTextArea;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ExecutionException;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.List;
 
 public class limoGui {
 
@@ -36,36 +38,26 @@ public class limoGui {
 	private JPanel controlPanel;
 
 	public limoGui() {
-		
 
-				prepareGUI();
-			}
-				
-		
-	
-		
-	
+		prepareGUI();
+	}
 
 	public static void main(String[] args) {
-		
-		///call the GUI constructor on the Event Dispatch Thread
-		
-		
-        SwingUtilities.invokeLater(new Runnable() {  //Note 1
-            public void run() {
-        		limoGui swingControlDemo = new limoGui();
-        		swingControlDemo.showProgressBarDemo();
 
-            }
-        });
-		
-		
+		/// call the GUI constructor on the Event Dispatch Thread
+
+		SwingUtilities.invokeLater(new Runnable() { // Note 1
+			public void run() {
+				limoGui swingControlDemo = new limoGui();
+				swingControlDemo.showProgressBarDemo();
+
+			}
+		});
 
 	}
 
-	 
 	private void prepareGUI() {
-		
+
 		mainFrame = new JFrame("Java Swing Examples");
 
 		mainFrame.getContentPane().setLayout(null);
@@ -76,7 +68,6 @@ public class limoGui {
 			public void windowClosing(WindowEvent windowEvent) {
 				System.exit(0);
 			}
-
 
 		});
 		headerLabel = new JLabel();
@@ -107,7 +98,6 @@ public class limoGui {
 		mainFrame.getContentPane().add(label_3);
 
 	}
-	
 
 	private JProgressBar progressBar;
 	private JProgressBar progressBar2;
@@ -117,6 +107,10 @@ public class limoGui {
 	private Task task2;
 	private Task task3;
 	private Task task4;
+	private Worker worker;
+	private Worker worker2;
+	private Worker worker3;
+	private Worker worker4;
 	private JButton startButton;
 	private JTextArea threadOneProgress;
 	private JTextArea threadOneProgress2;
@@ -183,7 +177,7 @@ public class limoGui {
 		txtrGrandTotal_1.setFont(new Font("Dialog", Font.BOLD, 12));
 		txtrGrandTotal_1.setText("Grand Total :");
 		txtrGrandTotal_1.setBounds(234, 179, 96, 15);
-		
+
 		mainFrame.getContentPane().add(txtrGrandTotal_1);
 
 		GrandTotal = new JTextArea();
@@ -199,14 +193,26 @@ public class limoGui {
 		startButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				task = new Task(progressBar, threadOneProgress, GrandTotal, 50);
-				task.start();
-				task2 = new Task(progressBar2, threadOneProgress2, GrandTotal, 70);
-				task2.start();
-				task3 = new Task(progressBar3, threadOneProgress3, GrandTotal, 90);
-				task3.start();
-				task4 = new Task(progressBar4, threadOneProgress4, GrandTotal , 110);
-				task4.start();
+
+				/**
+				 * start a version using SwingWorker
+				 */
+				worker = new Worker(progressBar, threadOneProgress, GrandTotal, 60);
+				worker.execute();
+				worker2 = new Worker(progressBar2, threadOneProgress2, GrandTotal, 60);
+				worker2.execute();
+				worker3 = new Worker(progressBar3, threadOneProgress3, GrandTotal, 60);
+				worker3.execute();
+				worker4 = new Worker(progressBar4, threadOneProgress4, GrandTotal, 60);
+				worker4.execute();
+				/***
+				 * task = new Task(progressBar, threadOneProgress, GrandTotal, 60);
+				 * task.start(); task2 = new Task(progressBar2, threadOneProgress2, GrandTotal,
+				 * 60); task2.start(); task3 = new Task(progressBar3, threadOneProgress3,
+				 * GrandTotal, 60); task3.start(); task4 = new Task(progressBar4,
+				 * threadOneProgress4, GrandTotal , 60); task4.start();
+				 * 
+				 ***/
 			}
 		});
 		mainFrame.add(startButton);
@@ -233,10 +239,84 @@ public class limoGui {
 		mainFrame.getContentPane().add(btnResume);
 	}
 
+	/// CREATE A SWING WORKER THREAD TO UPDATE GUI
+
+	class Worker extends SwingWorker<Boolean, Integer> {
+
+		private final JProgressBar WorkerThreadProgressBar;
+		private final JTextArea WorkerThreadTextArea;
+		private final JTextArea WorkerGrandTotalArea;
+		private final int WorkerSleepTime;
+
+		Worker(JProgressBar WTPB, JTextArea WTTA, JTextArea WGTA, int WST) {
+			WorkerThreadProgressBar = WTPB;
+			WorkerThreadTextArea = WTTA;
+			WorkerGrandTotalArea = WGTA;
+			WorkerSleepTime = WST;
+		}
+
+		@Override
+		protected Boolean doInBackground() throws Exception {
+			// To identify whether the background job is running out of EDT
+			System.out.println("doSomething() running in EDT?" + SwingUtilities.isEventDispatchThread());
+
+			for (int i = 0; i <= 100; i += 1) {
+				final int progress = i;
+				int j = i;
+
+				try {
+					Thread.sleep(WorkerSleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace(System.out);
+				}
+				publish(i);
+			}
+
+			return true;
+		}
+
+		@Override
+		protected void done() {
+			try {
+				/// label.setText(String.format("%d", get()));
+			} catch (Exception ignore) {
+			}
+		}
+
+		@Override
+		protected void process(List<Integer> chunks) {
+			for (int num : chunks) {
+				WorkerThreadTextArea.setText(String.format("%d", num));
+				WorkerThreadProgressBar.setValue(num);
+
+				synchronized (WorkerGrandTotalArea) {
+					// synchronizing the update of GrandTotalObject
+					if (num < 100)
+
+					{
+
+						try {
+							Thread.sleep(50);
+							WorkerGrandTotalArea.setText(
+									String.format("%d", (1 + Integer.parseInt(WorkerGrandTotalArea.getText()))));
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace(System.out);
+
+						}
+					}
+
+				}
+			}
+
+		}
+	}
+
 	// create a thread with parameters progress bar
 	// thread total label
 	// grand total label
 	// interval in milliseconds for sleep step in each thread
+	// this is unused
 	private class Task extends Thread {
 		private final JProgressBar ThreadProgressBar;
 		private final JTextArea ThreadTextArea;
@@ -247,41 +327,42 @@ public class limoGui {
 			ThreadProgressBar = JP;
 			ThreadTextArea = JT;
 			SleepTime = ST;
-			GrandTotalArea = GT; 
+			GrandTotalArea = GT;
 
 		}
 
 		public void run() {
-			for ( int i = 0; i <= 100; i += 1) {
+			for (int i = 0; i <= 100; i += 1) {
 				final int progress = i;
-				int j = i; 
+				int j = i;
 
+				// asyncExec(new Runnable() {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						// update the gui for this thread
 						ThreadProgressBar.setValue(progress);
 						ThreadTextArea.setText(String.format("%d", progress));
-						// this wont work !! 
-						
-				        synchronized(GrandTotalArea) 
-				        { 
-				            // synchronizing the update of GrandTotalObject 
-						if (j<100) 
-						
-						{
-					   
-						try {
-							sleep(50);
-							GrandTotalArea.setText(String.format("%d", (1 + Integer.parseInt(GrandTotalArea.getText()))));
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace(System.out);
-							
-						}}
-						
-				        }
-				
-						
+						// this wont work !!
+
+						synchronized (GrandTotalArea) {
+							// synchronizing the update of GrandTotalObject
+							if (j < 100)
+
+							{
+
+								try {
+									sleep(50);
+									GrandTotalArea.setText(
+											String.format("%d", (1 + Integer.parseInt(GrandTotalArea.getText()))));
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace(System.out);
+
+								}
+							}
+
+						}
+
 					}
 				});
 				try {
@@ -292,4 +373,5 @@ public class limoGui {
 			}
 		}
 	}
+
 }
